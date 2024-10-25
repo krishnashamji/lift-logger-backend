@@ -1,45 +1,40 @@
 import jwt from "jsonwebtoken";
-import { User } from "../models/users.model";
-import bcrypt from "bcrypt";
-import { jwtPrivateKey } from "../config/jwtPrivateKey.config";
-import { validateRegistration, validateLogin } from "../utils/users.utils";
+import { User } from "../models/users.models.js";
+import bcrypt from "bcrypt"
+import { jwtPrivateKey } from "../config/jwtPrivateKey.config.js";
+import { validateRegistration, validateLogin } from "../utils/users.utils.js";
 
-export const registerNewUser = async (req) => {
-  // Validates incoming request body
-  const { errors } = validateRegistration(req);
-  if (errors) throw new Error(errors.details);
-
+export const authorizeUser = async (req) => {
   // Checks if the user already exists
-  const user = await User.find({ email: req.email });
-  if (user) throw new Error("User already exists");
+  const user = await User.findOne({ email: req.email });
 
-  // Create new user object if user doesn't exist and save it
-  if (!user) {
+  // If user DOES exist, log them in
+  if (user) {
+    // Validates incoming request body
+    const { errors } = validateLogin(req.body);
+    if (errors) throw new Error(errors.details);
+
+    // Generate jwt token
+    const token = jwt.sign({ _id: user._id }, jwtPrivateKey);
+
+    return token;
+  } else {
+    // Validates incoming request body
+    const { errors } = validateRegistration(req);
+    if (errors) throw new Error(errors.details);
+
+    // Create user in the database
     const user = new User({
       email: req.email,
       password: await bcrypt.hash(req.password, 12),
     });
+
     await user.save();
+
+    // Generate jwt token
+    const token = jwt.sign({ _id: user._id }, jwtPrivateKey);
+
+    return token;
   }
-
-  // Generate jwt token
-  const token = jwt.sign({ _id: user._id }, jwtPrivateKey);
-
-  return token;
 };
 
-export const loginUser = async (req) => {
-  // Validates incoming request body
-  const { errors } = validateLogin(req.body);
-  if (errors) throw new Error(errors.details);
-
-  // Checks if user doesn't exist
-  const user = await User.find({ email: req.email });
-  if (!user) {
-    throw new Error("Invalid email");
-  }
-
-  const token = jwt.sign({ _id: user._id }, jwtPrivateKey);
-
-  return token;
-};

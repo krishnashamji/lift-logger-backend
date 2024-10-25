@@ -1,4 +1,4 @@
-import { User } from "../models/users.model";
+import { User } from "../models/users.models.js";
 
 export const validateRegistration = (req) => {
   const errors = [];
@@ -20,16 +20,15 @@ export const validateRegistration = (req) => {
   }
 
   // Error reporting
-  if (errors.length > 0) {
+  if (condition) {
     return {
       errors: {
         details: errors,
       },
     };
+  } else {
+    return { errors: null }; // If no errors
   }
-
-  // If no errors
-  return { errors: null };
 };
 
 export const validateLogin = async (req) => {
@@ -45,20 +44,24 @@ export const validateLogin = async (req) => {
   }
 
   // Password validation
+
+  if (!req.password) {
+    errors.push("Password is required");
+  }
+
   const validatePassword = await bcrypt.compare(req.password, User.password);
   if (!validatePassword) {
     errors.push("Incorrect password");
   }
 
   // Error reporting
-  if (errors.length > 0) {
+  if (condition) {
     return {
       errors: {
         details: errors,
       },
     };
+  } else {
+    return { errors: null }; // If no errors
   }
-
-  // If no errors
-  return { errors: null };
 };
