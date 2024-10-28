@@ -1,26 +1,27 @@
 import { User } from "../models/users.models.js";
+import bcrypt from "bcrypt";
 
-export const validateRegistration = (req) => {
+export const validateRegistration = (reqBody) => {
   const errors = [];
 
   // Email validation
-  if (!req.email) {
+  if (!reqBody.email) {
     errors.push("Email is required");
-  } else if (req.email.length < 1 || req.email.length >= 255) {
+  } else if (reqBody.email.length < 1 || reqBody.email.length >= 255) {
     errors.push("Email must be 1 and 255 characters long");
-  } else if (req.email.includes("@")) {
+  } else if (!reqBody.email.includes("@")) {
     errors.push("Email must be formatted corectly");
   }
 
   // Password validation
-  if (!req.password) {
+  if (!reqBody.password) {
     errors.push("Password is required");
-  } else if (req.password < 6 || req.password >= 1024) {
+  } else if (reqBody.password.length < 6 || reqBody.password.length >= 1024) {
     errors.push("Password must be greater than 6 characters");
   }
 
   // Error reporting
-  if (condition) {
+  if (errors.length > 0) {
     return {
       errors: {
         details: errors,
@@ -31,31 +32,36 @@ export const validateRegistration = (req) => {
   }
 };
 
-export const validateLogin = async (req) => {
+export const validateLogin = async (reqBody) => {
   const errors = [];
 
   // Email validation
-  if (!req.email) {
+  if (!reqBody.email) {
     errors.push("Email is required");
-  } else if (req.email.length < 1 || req.email.length >= 255) {
+  } else if (reqBody.email.length < 1 || reqBody.email.length >= 255) {
     errors.push("Email must be 1 and 255 characters long");
-  } else if (req.email.includes("@")) {
+  } else if (!reqBody.email.includes("@")) {
     errors.push("Email must be formatted corectly");
   }
 
   // Password validation
 
-  if (!req.password) {
+  if (!reqBody.password) {
     errors.push("Password is required");
   }
 
-  const validatePassword = await bcrypt.compare(req.password, User.password);
-  if (!validatePassword) {
-    errors.push("Incorrect password");
+  const user = await User.findOne({ email: reqBody.email });
+  if (!user) {
+    errors.push("User not found");
+  } else {
+    const validatePassword = await bcrypt.compare(reqBody.password, user.password);
+    if (!validatePassword) {
+      errors.push("Incorrect password");
+    }
   }
 
   // Error reporting
-  if (condition) {
+  if (errors.length > 0) {
     return {
       errors: {
         details: errors,
