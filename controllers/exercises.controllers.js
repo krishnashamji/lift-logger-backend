@@ -1,6 +1,5 @@
 import * as exercisesService from "../services/exercises.services.js";
 
-// Register user
 export const getExercises = async (req, res) => {
   try {
     const muscle = req.query.muscle;
