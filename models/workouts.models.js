@@ -1,34 +1,35 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const workoutsSchema = new mongoose.Schema({
-  userId: { 
-    type: String, 
-    unique: true 
-  },
-  workoutTitle: {
-    type: String,
-    required: true,
-    minlength: 1,
-  },
-  exercise: [
-    {
-      name: {
-        type: String,
-        required: true,
-        unique: true,
-      },
-      sets: [
-        {
-          setNo: { type: Number, unique: true },
-          targetReps: { type: String, default: "8-10" },
-        },
-      ],
-    },
-  ],
+
+const kgAndReps = new Schema({
+  kg: { type: Number, default: 0 },
+  reps: { type: Number, default: 0 },
+})
+
+const setSchema = new Schema({
+  createdAt: { type: Date, default: Date.now },
+  setNo: { type: Number, required: true },
+  previous: { type: String, default: "" },
+  targetReps: { type: String, default: "8-10" },
+  kgAndReps: [kgAndReps]
 });
 
-const Workouts = mongoose.model("Workouts", workoutsSchema);
+const exerciseSchema = new Schema({
+  name: { type: String, required: true },
+  sets: [setSchema]
+});
+
+const workoutsSchema = new Schema({
+  workoutTitle: { type: String, required: true, minlength: 1},
+  exercises: [exerciseSchema]
+});
+
+const userWorkoutsSchema = new Schema({
+  userId: { type: String, require: true},
+  workouts: [workoutsSchema]
+});
+
+
+const Workouts = mongoose.model("Workouts", userWorkoutsSchema);
 
 export { Workouts };
-
-

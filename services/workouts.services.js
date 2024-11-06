@@ -10,14 +10,18 @@ export const createWorkout = (
 ) => {
   const workout = new Workouts({
     userId: userId,
-    workoutTitle: workoutTitle,
-    exercise: [
+    workouts: [
       {
-        name: exerciseName,
-        sets: [
+        workoutTitle: workoutTitle,
+        exercise: [
           {
-            setNo: setNo,
-            targetReps: targetReps,
+            name: exerciseName,
+            sets: [
+              {
+                setNo: setNo,
+                targetReps: targetReps,
+              },
+            ],
           },
         ],
       },
@@ -26,10 +30,20 @@ export const createWorkout = (
   return workout.save();
 };
 
-export const logWorkout = async (userId, workoutTitle) => {
-  
-}
+export const logWorkout = async (userId, workouts, exerciseName, kgs, reps) => {
+  try {
+    const workout = await Workouts.findOne({
+      userId,
+      workouts,
+    });
 
+    if (!workout) {
+      throw new Error("Workout not found");
+    }
+
+
+  } catch (error) {}
+};
 
 // {
 //   userId: "oij4ce"

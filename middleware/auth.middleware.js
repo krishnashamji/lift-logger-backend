@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { jwtPrivateKey } from "../config/jwtPrivateKey.config.JS"
+import { jwtPrivateKey } from "../config/jwtPrivateKey.config.js"
 
 function auth(req, res, next) {
   const token = req.header("x-auth-token");

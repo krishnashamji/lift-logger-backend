@@ -13,4 +13,3 @@ function initRoutes(app) {
 }
 
 export default initRoutes;
-x
