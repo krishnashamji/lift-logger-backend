@@ -2,16 +2,17 @@
 import express from "express";
 
 // Init database and routes
-import initDB from "./utils/initdb.utils.js"
+import initDB from "./utils/initPrismaDB.utils.js"
 import initRoutes from './utils/initRoutes.utils.js'
 
 // Server Code
 const app = express();
 
-// MiddleWares
-initDB("mongodb://127.0.0.1:27017/lift-logger")
-initRoutes(app);
+// Init database
+initDB()
 
+// MiddleWares
+initRoutes(app);
 
 // Start Server
 const port = process.env.PORT || 3000; // Environment vairable

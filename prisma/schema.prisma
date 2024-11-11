@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        String     @id @default(uuid()) @map("_id") @db.ObjectId
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  email     String     @unique // Set Min, Max
+  password  String // Set Min, Max
+  workouts  Workouts[]
+}
+
+model Workouts {
+  id           String      @id @default(uuid()) @map("_id") @db.ObjectId
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  workoutTitle String
+  exercises    Exercises[]
+  users        Users?      @relation(fields: [usersId], references: [id])
+  usersId      String?     @db.ObjectId
+}
+
+model Exercises {
+  id           String    @id @default(uuid()) @map("_id") @db.ObjectId
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  exerciseName String
+  sets         Sets[]
+  workouts     Workouts? @relation(fields: [workoutsId], references: [id])
+  workoutsId   String?   @db.ObjectId
+}
+
+model Sets {
+  id          String       @id @default(uuid()) @map("_id") @db.ObjectId
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  setNo       Int
+  // previous    String
+  targetReps  String       @default("8-10")
+  kgsAndReps  KgsAndReps[]
+  exercises   Exercises?   @relation(fields: [exercisesId], references: [id])
+  exercisesId String?      @db.ObjectId
+}
+
+model KgsAndReps {
+  id        String   @id @default(uuid()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  kg        Int      @default(0) //How do I ensure postive numbers only?
+  reps      Int      @default(0)
+  sets      Sets?    @relation(fields: [setsId], references: [id])
+  setsId    String?  @db.ObjectId
+}
